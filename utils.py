@@ -1,7 +1,9 @@
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain_community.utilities import SQLDatabase
-from NL2SQL.Base import State
+from NL2SQL.Base import State, QueryOutput
+
 systemMsg = """
 **FALLBACK : If the query seems unrelated to the database then simply return "Sorry i couldn't understand the query"
 Given an input question, create a syntactically correct {dialect} query to
@@ -24,16 +26,19 @@ userMsg = """Question: {input}"""
 
 QueryPromptTemplate = ChatPromptTemplate([("system",systemMsg), ("user",userMsg)])
 
-def generate_prompt(db: SQLDatabase, state:State, top_k):
+def generate_query(db: SQLDatabase, state: State, top_k: int, llm: BaseChatModel) -> State:
     prompt = QueryPromptTemplate.invoke(
         {
-            "dialect":db.dialect,
-            "top_k":top_k,
-            "table_info":db.table_info, 
-            "input":state["question"]
+            "dialect": db.dialect,
+            "top_k": top_k,
+            "table_info": db.table_info,
+            "input": state["question"]
         }
     )
-    return prompt
+    struct_llm = llm.with_structured_output(QueryOutput)
+    query = struct_llm.invoke(prompt)
+    state["query"] = query['query']
+    return state
 
 def execute_query(db: SQLDatabase, state: State):
     execute_query_tool = QuerySQLDataBaseTool(db=db)

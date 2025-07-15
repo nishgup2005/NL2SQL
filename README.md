@@ -1,6 +1,6 @@
-# NL2SQL: Natural Language to SQL Query Generator
+# Query-Bridge : Natural Language to SQL Query Generator
 
-NL2SQL is a Python-based tool that leverages advanced language models (LLMs) to convert natural language questions into SQL queries, execute them on a specified database, and return human-readable answers. The system is modular, extensible, and supports prompt engineering for various SQL query types (aggregation, retrieval, ordering, etc.).
+Query-Bridge is a Python-based tool that leverages advanced language models (LLMs) to convert natural language questions into SQL queries, execute them on a specified database, and return human-readable answers. The system is modular, extensible, and supports prompt engineering for various SQL query types (aggregation, retrieval, ordering, etc.).
 
 ---
 
@@ -109,7 +109,7 @@ Other database parameters are also supported for flexibility.
 ---
 
 ## Usage
-### 1. Run the NL2SQL CLI
+### 1. Run the Query-Bridge CLI
 ```bash
 python main.py
 ```

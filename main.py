@@ -1,32 +1,68 @@
-from langchain.chat_models import init_chat_model
-from langchain_community.utilities import SQLDatabase
-from NL2SQL.settings.config import Config
-from NL2SQL.utils import generate_query, execute_query
-import os
+from langchain_core.runnables import RunnableBranch, RunnableLambda
+from NL2SQL.settings.config import db, llm
+from NL2SQL.utils import generate_state_intent, generate_state_query, get_invalid_state, get_clarity_state, execute_query, suppressWarnings, printState
+from NL2SQL.Base import IntentOutput, QueryOutput, AnsOutput
+from NL2SQL.prompts import IntentPrompt, RetrievalPrompt, DescPrompt, AscPrompt, AggPrompt, SubQueryPrompt, AnsPrompt
 
-db = SQLDatabase.from_uri(Config.DATABASE_URI)
+suppressWarnings()
 
-os.environ["GOOGLE_API_KEY"] = Config.GEMINI_API_KEY
+intent_prompt = IntentPrompt.prompt
+retr_prompt = RetrievalPrompt.prompt
+asc_prompt = AscPrompt.prompt
+desc_prompt = DescPrompt.prompt
+agg_prompt = AggPrompt.prompt
+sub_prompt = SubQueryPrompt.prompt
+ans_prompt = AnsPrompt.prompt
 
-llm = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
+intent_llm = llm.with_structured_output(IntentOutput)
+query_llm = llm.with_structured_output(QueryOutput)
+ans_llm = llm.with_structured_output(AnsOutput)
 
-question = input("Enter Your Question here: ")
+intent_chain = intent_prompt |  intent_llm | generate_state_intent
 
-state = {"question": question}
+gen_query_chain = query_llm | generate_state_query 
 
-state = generate_query(state=state, db=db, top_k="all", llm=llm)
-state = execute_query(db, state)
+gen_agg_query_chain = agg_prompt | gen_query_chain
+gen_asc_query_chain = asc_prompt | gen_query_chain
+gen_desc_query_chain = desc_prompt | gen_query_chain
+gen_retr_query_chain = retr_prompt | gen_query_chain
+gen_sub_query_chain = sub_prompt | gen_query_chain 
+clarity_chain = RunnableLambda(get_clarity_state)
+invalid_chain = RunnableLambda(get_invalid_state)
 
-"""Answer question using retrieved information as context."""
-prompt = (
-    "Given the following user question, corresponding SQL query, "
-    "and SQL result, answer the user question.\n\n"
-    f'Question: {state["question"]}\n'
-    f'SQL Query: {state["query"]}\n'
-    f'SQL Result: {state["result"]}'
-)
+branch = RunnableBranch(
+    (lambda state: state["intent"]==1,gen_retr_query_chain),
+    (lambda state: state["intent"]==2,gen_asc_query_chain),
+    (lambda state: state["intent"]==3,gen_desc_query_chain),
+    (lambda state: state["intent"]==4,gen_agg_query_chain),
+    (lambda state: state["intent"]==5,gen_sub_query_chain),
+    (lambda state: state["intent"]==6,clarity_chain),
+    invalid_chain # default / fallback
+    )
 
-response = llm.invoke(prompt)
-state["ans"] = response.content
 
-print(state)
+execute_chain = RunnableLambda(execute_query)
+
+ans_chain = ans_prompt |  ans_llm 
+
+final_chain = intent_chain | RunnableLambda(printState) | branch | RunnableLambda(printState) | execute_chain | RunnableLambda(printState) | ans_chain
+
+
+
+while True:
+    question = input("Enter your Question Here: ")
+    if question is not None and question.lower().strip() not in ["exit","escape","quit"]:
+        response = final_chain.invoke({
+            "question": question,
+            "dialect": db.dialect,
+            "table_names":db.get_usable_table_names(),
+            })
+        print(response)
+
+    else:
+        break
+print("Thank you for using our NL2SQL tool")
+
+
+
+

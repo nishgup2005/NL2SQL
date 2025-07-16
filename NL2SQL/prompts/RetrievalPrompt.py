@@ -13,7 +13,8 @@ Schema Info: {schema}
 2. use the join table clause as necessary to get the necessary tables and their columns 
 3. Do not use GROUP BY clause
 4. Do not use Order BY clause
-5. unless stated otherwise by the question always limit your answer to 5
+5. use the distinct keyword as required
+5. If the user does not ask for all responses or more than 5 responses limit your answers to 5 answers
 6. use double quotes around all columns names 
 7. RETURN ONLY THE QUERY AS A STATEMENT
 

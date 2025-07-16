@@ -3,7 +3,9 @@ from NL2SQL.settings.config import db, llm
 from NL2SQL.utils import generate_state_intent, generate_state_query, get_invalid_state, get_clarity_state, execute_query, suppressWarnings, printState
 from NL2SQL.Base import IntentOutput, QueryOutput, AnsOutput
 from NL2SQL.prompts import IntentPrompt, RetrievalPrompt, DescPrompt, AscPrompt, AggPrompt, SubQueryPrompt, AnsPrompt
-
+from datetime import datetime
+import os
+import json
 suppressWarnings()
 
 intent_prompt = IntentPrompt.prompt
@@ -47,20 +49,34 @@ ans_chain = ans_prompt |  ans_llm
 
 final_chain = intent_chain | RunnableLambda(printState) | branch | RunnableLambda(printState) | execute_chain | RunnableLambda(printState) | ans_chain
 
-
+user = input("enter username here")
+file_name = f"memory/{user}.json"
+chat_history={}
+if os.path.exists(file_name):
+    with open(file_name,"r") as f:
+        chat_history = json.load(f)
+else:
+    with open(file_name,"w") as f:
+        pass
 
 while True:
+    counter = 0
     question = input("Enter your Question Here: ")
     if question is not None and question.lower().strip() not in ["exit","escape","quit"]:
         response = final_chain.invoke({
             "question": question,
             "dialect": db.dialect,
             "table_names":db.get_usable_table_names(),
+            "chat_history":chat_history
             })
         print(response)
-
+        format = "%d %m %y"
+        chat_history[counter%5] = {"question":question,"answer":response, "timestamp":datetime.now().strftime("%d/%m/%Y")}
     else:
         break
+with open(file_name,"a") as f:
+    chat_json = json.dumps(chat_history)
+    f.write(chat_json)
 print("Thank you for using our NL2SQL tool")
 
 

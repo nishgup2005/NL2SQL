@@ -22,7 +22,7 @@ class IntentOutput(TypedDict):
     """Generated intent and list of relevant tables"""
     intent: Annotated[int,...,"The intent of the question"]
     relevant_tables: Annotated[list[str],...,"List of tables which are relevant to the question"]
-    question: Annotated[str, ..., "The Questions asked by user in the prompt"]
+    question: Annotated[str, ..., "The Correct Version of the Question asked by the user"]
 
 class AnsOutput(TypedDict):
     """Generated Answer by interpreting the Question Query and Result"""

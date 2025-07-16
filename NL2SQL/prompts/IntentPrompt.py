@@ -65,12 +65,17 @@ INVALID: If the question does not classify into any of the above intents or does
 The following question is asked by the user 
 {question}
 
-Read the question CAREFULLY and classify it into one of these 5 intents. 
-Return the intent and and a list of table names that are relevant to the question
+The following is the chat history along with its timestamp
+{chat_history}
+
+Read the question CAREFULLY and classify it into one of these 5 intents.
+If required transform the question according to the context from the chat history provided in this prompt
+Return the transfromed question, intent and and a list of table names that are relevant to the question
 in the format below:
 {{
     "intent":value_of_intent,
     "relevant_tables":list_of_relevant_table_names
+    "question":transformed question
 }}
 
 """

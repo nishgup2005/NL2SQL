@@ -12,7 +12,7 @@ Schema Info: {schema}
 1. use the where clause as required 
 2. use the join table clause as necessary to get the necessary tables and their columns 
 3. Use a subquery in WHERE or HAVING as needed
-4. Retrieve at most 10 rows with LIMIT.
+5. If the user does not ask for ALL responses or MORE THAN 5 responses limit your answers to 5 answers
 5. Include JOINs if needed.
 6. Use double quotes around all column names.
 7. RETURN ONLY THE QUERY AS A STATEMENT

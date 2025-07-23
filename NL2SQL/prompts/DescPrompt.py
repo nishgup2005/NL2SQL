@@ -15,7 +15,8 @@ Schema Info: {schema}
 4. always order by descending
 5. If the user does not ask for all responses or more than 5 responses limit your answers to 5 answers
 6. use double quotes around all columns names 
-7. RETURN ONLY THE QUERY AS A STATEMENT
+7. DO NOT USE DOUBLE QUOTES AROUND LITERALS OR VALUES
+8. **RETURN ONLY THE QUERY AS A STATEMENT**
 
 """
 

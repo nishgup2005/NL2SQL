@@ -1,11 +1,8 @@
 from langchain_core.runnables import RunnableBranch, RunnableLambda
-from NL2SQL.settings.config import db, llm
+from NL2SQL.settings.config import llm
 from NL2SQL.utils import generate_state_intent, generate_state_query, get_invalid_state, get_clarity_state, execute_query, suppressWarnings, printState
 from NL2SQL.Base import IntentOutput, QueryOutput, AnsOutput
 from NL2SQL.prompts import IntentPrompt, RetrievalPrompt, DescPrompt, AscPrompt, AggPrompt, SubQueryPrompt, AnsPrompt
-from datetime import datetime
-import os
-import json
 suppressWarnings()
 
 intent_prompt = IntentPrompt.prompt
@@ -48,40 +45,3 @@ execute_chain = RunnableLambda(execute_query)
 ans_chain = ans_prompt |  ans_llm 
 
 final_chain = intent_chain | RunnableLambda(printState) | branch | RunnableLambda(printState) | execute_chain | RunnableLambda(printState) | ans_chain
-
-user = input("enter username here")
-file_name = f"memory/{user}.json"
-chat_history={}
-if os.path.exists(file_name):
-    with open(file_name,"r") as f:
-        data = f.read()
-        if len(data)!=0:
-            chat_history = json.loads(data)
-
-counter = 0
-while True:
-    counter += 1
-    question = input("Enter your Question Here: ")
-    if question is not None and question.lower().strip() not in ["exit","escape","quit"]:
-        response = final_chain.invoke({
-            "question": question,
-            "dialect": db.dialect,
-            "table_names":db.get_usable_table_names(),
-            "chat_history":chat_history
-            })
-        print(response)
-        format = '%Y-%m-%d %H:%M:%S'
-        chat_history[counter%5] = {"question":question,"answer":response, "timestamp":datetime.now().strftime(format)}
-    else:
-        chat_history[counter%5] = {"question":question,"answer": f"User has ended the conversation at turn number {counter}","timestamp":datetime.now().strftime(format)}
-        break
-
-
-with open(file_name,"w") as f:
-    chat_json = json.dumps(chat_history)
-    f.write(chat_json)
-print("Thank you for using our NL2SQL tool")
-
-
-
-

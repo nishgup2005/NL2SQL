@@ -15,7 +15,8 @@ Schema Info: {schema}
 5. If the user does not ask for ALL responses or MORE THAN 5 responses limit your answers to 5 answers
 5. Include JOINs if needed.
 6. Use double quotes around all column names.
-7. RETURN ONLY THE QUERY AS A STATEMENT
+7. DO NOT USE DOUBLE QUOTES AROUND LITERALS OR VALUES
+8. **RETURN ONLY THE QUERY AS A STATEMENT**
 
 """
 

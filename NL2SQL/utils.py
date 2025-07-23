@@ -88,3 +88,5 @@ def suppressWarnings():
 def printState(state:State):
     pprint(state)
     return (state)
+
+format = '%Y-%m-%d %H:%M:%S'

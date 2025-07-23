@@ -13,8 +13,9 @@ Schema Info: {schema}
 2. Use the join table clause as necessary to get the necessary tables and their columns 
 3. Use GROUP BY clause as necessary
 4. Use Order by only if necessary
-5. use double quotes around all columns names 
-6. RETURN ONLY THE QUERY AS A STATEMENT
+5. use double quotes around all columns names only
+6. DO NOT USE DOUBLE QUOTES AROUND LITERALS OR VALUES
+7. **RETURN ONLY THE QUERY AS A STATEMENT**
 
 """
 

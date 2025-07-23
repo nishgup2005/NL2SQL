@@ -14,9 +14,10 @@ Schema Info: {schema}
 3. Do not use GROUP BY clause
 4. Do not use Order BY clause
 5. use the distinct keyword as required
-5. If the user does not ask for all responses or more than 5 responses limit your answers to 5 answers
+5. Unless mentioned specifically for a PARTICULAR NUMBER of values or ALL values limit your answers to 5
 6. use double quotes around all columns names 
-7. RETURN ONLY THE QUERY AS A STATEMENT
+7. DO NOT USE DOUBLE QUOTES AROUND LITERALS OR VALUES
+8. **RETURN ONLY THE QUERY AS A STATEMENT**
 
 """
 

@@ -1,7 +1,7 @@
 from typing import TypedDict, Annotated
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_community.utilities import SQLDatabase
-
+from pydantic import BaseModel
 class State(TypedDict):
     intent: int
     llm: BaseChatModel
@@ -27,3 +27,6 @@ class IntentOutput(TypedDict):
 class AnsOutput(TypedDict):
     """Generated Answer by interpreting the Question Query and Result"""
     result:Annotated[str, ..., "A well Formated structured form of the result in english language"]
+
+class User(BaseModel):
+    pass
